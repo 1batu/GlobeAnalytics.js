@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, Stars } from '@react-three/drei';
 import DashboardSidebar from './components/DashboardSidebar';
 import ParticleGlobe from './components/ParticleGlobe';
 
@@ -26,7 +26,7 @@ const DUMMY_DATA = {
 };
 
 function App() {
-  const [data, setData] = useState(DUMMY_DATA); // Start with dummy data for visuals
+  const [data, setData] = useState(DUMMY_DATA);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -40,17 +40,58 @@ function App() {
       } catch (err) {
         console.error('Failed to fetch dashboard data', err);
         setError(err.message);
-        // Keep showing dummy data if fetch fails, but show error toast
       }
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 10000); // Faster refresh for debug
+    const interval = setInterval(fetchData, 10000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="flex h-screen w-full bg-[#0B0F19] text-white overflow-hidden font-sans relative">
+    <div className="fixed inset-0 w-full h-full bg-[#020202] text-white overflow-hidden font-sans selection:bg-cyan-500/30 selection:text-cyan-100">
+
+      {/* 1. Full Screen Globe Background */}
+      <div className="absolute inset-0 z-0 w-full h-full">
+        <Canvas
+          className="w-full h-full block"
+          style={{ width: '100vw', height: '100vh' }}
+          camera={{ position: [0, 0, 16], fov: 45 }}
+        >
+          <color attach="background" args={['#020202']} />
+
+          <ambientLight intensity={3} />
+          <pointLight position={[20, 20, 20]} intensity={4} color="#ffffff" />
+          <pointLight position={[-20, -10, -20]} intensity={2} color="#4f46e5" />
+
+          <Stars radius={100} depth={50} count={7000} factor={4} saturation={0} fade speed={1} />
+
+          <ParticleGlobe routes={data?.routes} />
+
+          <OrbitControls
+            enableZoom={true}
+            enablePan={false}
+            minDistance={6}
+            maxDistance={25}
+            autoRotate
+            autoRotateSpeed={0.5}
+            target={[0, 0, 0]}
+          />
+        </Canvas>
+      </div>
+
+      {/* 2. Floating Sidebar Overlay */}
+      <div className="absolute top-0 left-0 h-full w-[400px] z-10 p-6 pointer-events-none">
+        {/* Pointer events auto re-enabled on the sidebar content itself */}
+        <div className="h-full w-full pointer-events-auto">
+          <DashboardSidebar
+            stats={data?.stats}
+            countries={data?.countries}
+            pages={data?.pages}
+          />
+        </div>
+      </div>
+
       {/* Error Toast */}
       {error && (
         <div className="absolute top-4 right-4 z-50 bg-red-500/80 text-white px-4 py-2 rounded shadow-lg backdrop-blur text-xs font-mono">
@@ -58,37 +99,6 @@ function App() {
           <span className="opacity-75">Showing Simulation Data</span>
         </div>
       )}
-
-      {/* Left Sidebar (30%) */}
-      <div className="w-[350px] flex-shrink-0 z-20 relative h-full">
-        <DashboardSidebar
-          stats={data?.stats}
-          countries={data?.countries}
-          pages={data?.pages}
-        />
-      </div>
-
-      {/* Right Globe Area (70%) */}
-      <div className="flex-1 relative h-full">
-        <Canvas className="absolute inset-0 w-full h-full" camera={{ position: [0, 0, 12], fov: 45 }}>
-          <ambientLight intensity={0.8} />
-          <pointLight position={[10, 10, 10]} intensity={1.5} />
-          <pointLight position={[-10, -10, -10]} intensity={0.5} color="#6B89FF" />
-          <ParticleGlobe routes={data?.routes} />
-          <OrbitControls
-            target={[0, 0, 0]}
-            enableZoom={true}
-            enablePan={false}
-            minDistance={8}
-            maxDistance={25}
-            autoRotate
-            autoRotateSpeed={0.5}
-          />
-        </Canvas>
-
-        {/* Background Gradient Overlay */}
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-[#0B0F19] via-transparent to-transparent z-10"></div>
-      </div>
     </div>
   );
 }

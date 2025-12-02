@@ -70,23 +70,24 @@ function App() {
 
       {/* Right Globe Area (70%) */}
       <div className="flex-1 relative h-full">
-        <Canvas className="w-full h-full" camera={{ position: [0, 0, 16], fov: 45 }}>
+        <Canvas className="absolute inset-0 w-full h-full" camera={{ position: [0, 0, 12], fov: 45 }}>
           <ambientLight intensity={0.8} />
           <pointLight position={[10, 10, 10]} intensity={1.5} />
           <pointLight position={[-10, -10, -10]} intensity={0.5} color="#6B89FF" />
           <ParticleGlobe routes={data?.routes} />
           <OrbitControls
+            target={[0, 0, 0]}
             enableZoom={true}
             enablePan={false}
             minDistance={8}
-            maxDistance={30}
+            maxDistance={25}
             autoRotate
             autoRotateSpeed={0.5}
           />
         </Canvas>
 
         {/* Background Gradient Overlay */}
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-[#0B0F19] via-transparent to-transparent z-0"></div>
+        <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-[#0B0F19] via-transparent to-transparent z-10"></div>
       </div>
     </div>
   );

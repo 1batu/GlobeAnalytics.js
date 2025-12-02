@@ -19,9 +19,9 @@ const DUMMY_DATA = {
     { path: '/blog', views: 200 }
   ],
   routes: [
-    { startLat: 52.52, startLng: 13.405, endLat: 39.93, endLng: 32.85 }, // Berlin -> Ankara
-    { startLat: 40.71, startLng: -74.00, endLat: 39.93, endLng: 32.85 }, // NYC -> Ankara
-    { startLat: 51.50, startLng: -0.12, endLat: 39.93, endLng: 32.85 }, // London -> Ankara
+    { startLat: 52.52, startLng: 13.405, endLat: 39.93, endLng: 32.85, label: 'Germany' }, // Berlin -> Ankara
+    { startLat: 40.71, startLng: -74.00, endLat: 39.93, endLng: 32.85, label: 'USA' }, // NYC -> Ankara
+    { startLat: 51.50, startLng: -0.12, endLat: 39.93, endLng: 32.85, label: 'UK' }, // London -> Ankara
   ]
 };
 
@@ -56,7 +56,7 @@ function App() {
         <Canvas
           className="w-full h-full block"
           style={{ width: '100vw', height: '100vh' }}
-          camera={{ position: [0, 0, 16], fov: 45 }}
+          camera={{ position: [0, 0, 28], fov: 45 }}
         >
           <color attach="background" args={['#020202']} />
 
@@ -66,16 +66,18 @@ function App() {
 
           <Stars radius={100} depth={50} count={7000} factor={4} saturation={0} fade speed={1} />
 
-          <ParticleGlobe routes={data?.routes} />
+          <group position={[6, 0, 0]}>
+            <ParticleGlobe routes={data?.routes} />
+          </group>
 
           <OrbitControls
             enableZoom={true}
             enablePan={false}
-            minDistance={6}
-            maxDistance={25}
+            minDistance={10}
+            maxDistance={50}
             autoRotate
             autoRotateSpeed={0.5}
-            target={[0, 0, 0]}
+            target={[6, 0, 0]}
           />
         </Canvas>
       </div>

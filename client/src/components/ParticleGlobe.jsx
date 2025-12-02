@@ -1,6 +1,16 @@
 import React, { useRef, useMemo, useEffect, useState } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
+import { Text } from '@react-three/drei';
 import * as THREE from 'three';
+
+// Let's do the replacement in chunks.
+
+// Chunk 1: Imports
+// Chunk 2: PulseMarker usage in map
+// Chunk 3: PulseMarker definition
+
+// ... wait, I can do this in one go if I'm careful, or multiple chunks.
+// Let's use multiple chunks for safety.
 
 const ParticleGlobe = ({ routes }) => {
   const meshRef = useRef();
@@ -112,8 +122,65 @@ const ParticleGlobe = ({ routes }) => {
 
       {/* 4. Arcs */}
       {routes && routes.map((route, i) => (
-        <Arc key={i} start={{lat: route.startLat, lng: route.startLng}} end={{lat: route.endLat, lng: route.endLng}} />
+        <React.Fragment key={i}>
+          <Arc start={{lat: route.startLat, lng: route.startLng}} end={{lat: route.endLat, lng: route.endLng}} />
+          <PulseMarker lat={route.startLat} lng={route.startLng} label={route.label} />
+        </React.Fragment>
       ))}
+    </group>
+  );
+};
+
+const PulseMarker = ({ lat, lng, label }) => {
+  const meshRef = useRef();
+
+  // Convert lat/lng to 3D position
+  const position = useMemo(() => {
+    const radius = 5.1; // Same as dots
+    const phi = (90 - lat) * (Math.PI / 180);
+    const theta = (lng + 180) * (Math.PI / 180);
+    return new THREE.Vector3(
+      -(radius * Math.sin(phi) * Math.cos(theta)),
+      radius * Math.cos(phi),
+      radius * Math.sin(phi) * Math.sin(theta)
+    );
+  }, [lat, lng]);
+
+  useFrame((state) => {
+    if (meshRef.current) {
+      // Pulse animation - More subtle
+      const t = state.clock.getElapsedTime();
+      const scale = 1 + Math.sin(t * 3) * 0.2; // Reduced pulse scale
+      meshRef.current.scale.set(scale, scale, scale);
+
+      // Look at center to align with surface normal
+      meshRef.current.lookAt(0, 0, 0);
+    }
+  });
+
+  return (
+    <group position={position}>
+      <mesh ref={meshRef}>
+        <circleGeometry args={[0.08, 16]} /> {/* Smaller radius */}
+        <meshBasicMaterial color="#00ffff" transparent opacity={0.8} side={THREE.DoubleSide} toneMapped={false} />
+      </mesh>
+
+      {/* Text Label */}
+      {label && (
+        <Text
+          position={[0, 0.15, 0]}
+          // Actually, Text needs to be oriented correctly.
+          // Since the group is at 'position', we can just offset the text slightly outward or 'up' in local space.
+          // But 'up' in local space depends on rotation.
+          // Simplest is to make Text look at camera.
+          fontSize={0.15}
+          color="white"
+          anchorX="center"
+          anchorY="bottom"
+        >
+          {label}
+        </Text>
+      )}
     </group>
   );
 };

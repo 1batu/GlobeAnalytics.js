@@ -2,20 +2,10 @@ import React from 'react';
 
 const DashboardSidebar = ({ stats, countries, pages }) => {
   return (
-    <div className="h-full w-full bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl p-6 flex flex-col overflow-y-auto shadow-2xl text-white">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold tracking-tighter font-display text-white mb-2">
-          GLOBE<span className="text-cyan-400">ANALYTICS</span>
-        </h1>
-        <div className="flex items-center gap-2">
-          <div className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-          </div>
-          <p className="text-cyan-400 font-mono text-xs tracking-widest uppercase">SYSTEM ONLINE</p>
-        </div>
-      </div>
+    <div className="h-full w-full p-6 flex flex-col overflow-y-auto text-white">
+      <style>{`
+        .stat-text { text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
+      `}</style>
 
       {/* General Stats */}
       <div className="grid grid-cols-2 gap-3 mb-8">
@@ -26,8 +16,8 @@ const DashboardSidebar = ({ stats, countries, pages }) => {
       </div>
 
       {/* Country List */}
-      <div className="mb-8">
-        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+      <div className="mb-8 bg-black/40 backdrop-blur-md rounded-xl p-4 border border-white/10">
+        <h3 className="text-xs font-bold text-gray-300 uppercase tracking-widest mb-4 flex items-center gap-2 stat-text">
           <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full"></span>
           Top Regions
         </h3>
@@ -50,8 +40,8 @@ const DashboardSidebar = ({ stats, countries, pages }) => {
       </div>
 
       {/* Page List */}
-      <div className="flex-1">
-        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+      <div className="flex-1 bg-black/40 backdrop-blur-md rounded-xl p-4 border border-white/10">
+        <h3 className="text-xs font-bold text-gray-300 uppercase tracking-widest mb-4 flex items-center gap-2 stat-text">
           <span className="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
           Top Pages
         </h3>
@@ -79,11 +69,11 @@ const DashboardSidebar = ({ stats, countries, pages }) => {
 
 const StatCard = ({ label, value, delay }) => (
   <div
-    className="bg-white/5 p-4 rounded-xl border border-white/5 hover:border-cyan-500/30 transition-all hover:bg-white/10 group"
+    className="bg-black/50 backdrop-blur-md p-4 rounded-xl border border-white/10 hover:border-cyan-500/30 transition-all hover:bg-black/60 group"
     style={{ animationDelay: `${delay}ms` }}
   >
-    <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1 group-hover:text-cyan-400 transition-colors">{label}</p>
-    <p className="text-2xl font-mono text-white font-bold">{value || 0}</p>
+    <p className="text-[10px] text-gray-300 uppercase tracking-wider mb-1 group-hover:text-cyan-400 transition-colors stat-text">{label}</p>
+    <p className="text-2xl font-mono text-white font-bold stat-text">{value || 0}</p>
   </div>
 );
 

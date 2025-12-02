@@ -88,55 +88,53 @@ const ParticleGlobe = ({ routes }) => {
 
   return (
     <group ref={globeRef}>
-      {/* 1. Base Realistic Sphere - Brighter */}
+      {/* 1. Base Realistic Sphere - Deep Blue/Purple */}
       <mesh>
         <sphereGeometry args={[5, 64, 64]} />
         <meshPhongMaterial
-          map={earthMap}
-          color="#aaaaaa"
-          emissive="#222222"
-          specular="#555555"
-          shininess={10}
+          color="#1e1b4b" // Deep Indigo
+          emissive="#0f172a" // Dark Slate
+          specular="#60a5fa" // Blue highlight
+          shininess={20}
         />
       </mesh>
 
-      {/* 2. Procedural Dots Layer - Larger and Brighter */}
+      {/* 2. Procedural Dots Layer - White/Light Blue */}
       {dummyData.length > 0 && (
         <instancedMesh ref={meshRef} args={[null, null, dummyData.length]}>
-          <circleGeometry args={[0.06, 8]} /> {/* Larger dots */}
-          <meshBasicMaterial side={THREE.DoubleSide} transparent opacity={0.8} blending={THREE.AdditiveBlending} toneMapped={false} />
+          <circleGeometry args={[0.05, 8]} />
+          <meshBasicMaterial side={THREE.DoubleSide} transparent opacity={0.6} blending={THREE.AdditiveBlending} toneMapped={false} />
         </instancedMesh>
       )}
 
-      {/* 3. Atmosphere Glow - Stronger */}
+      {/* 3. Atmosphere Glow - Bright Cyan */}
       <mesh scale={[1.2, 1.2, 1.2]}>
         <sphereGeometry args={[5, 64, 64]} />
         <meshBasicMaterial
-          color="#4f46e5"
+          color="#3b82f6" // Bright Blue
           transparent
-          opacity={0.2}
+          opacity={0.15}
           side={THREE.BackSide}
           blending={THREE.AdditiveBlending}
         />
       </mesh>
 
-      {/* 4. Arcs */}
+      {/* 4. Arcs & Markers */}
       {routes && routes.map((route, i) => (
         <React.Fragment key={i}>
           <Arc start={{lat: route.startLat, lng: route.startLng}} end={{lat: route.endLat, lng: route.endLng}} />
-          <PulseMarker lat={route.startLat} lng={route.startLng} label={route.label} />
+          <DataBar lat={route.startLat} lng={route.startLng} label={route.label} />
         </React.Fragment>
       ))}
     </group>
   );
 };
 
-const PulseMarker = ({ lat, lng, label }) => {
+const DataBar = ({ lat, lng, label }) => {
   const meshRef = useRef();
 
-  // Convert lat/lng to 3D position
   const position = useMemo(() => {
-    const radius = 5.1; // Same as dots
+    const radius = 5.0;
     const phi = (90 - lat) * (Math.PI / 180);
     const theta = (lng + 180) * (Math.PI / 180);
     return new THREE.Vector3(
@@ -146,34 +144,43 @@ const PulseMarker = ({ lat, lng, label }) => {
     );
   }, [lat, lng]);
 
+  // Calculate rotation to stand perpendicular to surface
+  const quaternion = useMemo(() => {
+    const dummy = new THREE.Object3D();
+    dummy.position.copy(position);
+    dummy.lookAt(0, 0, 0);
+    return dummy.quaternion;
+  }, [position]);
+
   useFrame((state) => {
     if (meshRef.current) {
-      // Pulse animation - More subtle
+      // Pulse height
       const t = state.clock.getElapsedTime();
-      const scale = 1 + Math.sin(t * 3) * 0.2; // Reduced pulse scale
-      meshRef.current.scale.set(scale, scale, scale);
-
-      // Look at center to align with surface normal
-      meshRef.current.lookAt(0, 0, 0);
+      const scaleY = 1 + Math.sin(t * 3 + lat) * 0.3;
+      meshRef.current.scale.set(1, scaleY, 1);
     }
   });
 
   return (
-    <group position={position}>
-      <mesh ref={meshRef}>
-        <circleGeometry args={[0.08, 16]} /> {/* Smaller radius */}
-        <meshBasicMaterial color="#00ffff" transparent opacity={0.8} side={THREE.DoubleSide} toneMapped={false} />
+    <group position={position} quaternion={quaternion}>
+      {/* Vertical Bar */}
+      <mesh ref={meshRef} position={[0, 0, 1]} rotation={[Math.PI / 2, 0, 0]}> {/* Rotate to point out */}
+        <cylinderGeometry args={[0.05, 0.05, 2, 8]} /> {/* Tall thin bar */}
+        <meshBasicMaterial color="#60a5fa" transparent opacity={0.8} blending={THREE.AdditiveBlending} />
+      </mesh>
+
+      {/* Base Ring */}
+      <mesh position={[0, 0, 0.1]} rotation={[0, 0, 0]}>
+         <circleGeometry args={[0.15, 16]} />
+         <meshBasicMaterial color="#3b82f6" transparent opacity={0.5} side={THREE.DoubleSide} />
       </mesh>
 
       {/* Text Label */}
       {label && (
         <Text
-          position={[0, 0.15, 0]}
-          // Actually, Text needs to be oriented correctly.
-          // Since the group is at 'position', we can just offset the text slightly outward or 'up' in local space.
-          // But 'up' in local space depends on rotation.
-          // Simplest is to make Text look at camera.
-          fontSize={0.15}
+          position={[0, 2.5, 0]} // Top of the bar
+          rotation={[Math.PI / 2, Math.PI, 0]} // Face camera (approx) - actually needs billboard behavior
+          fontSize={0.3}
           color="white"
           anchorX="center"
           anchorY="bottom"
@@ -200,7 +207,7 @@ const Arc = ({ start, end }) => {
     const startPos = getPos(start.lat, start.lng, 5);
     const endPos = getPos(end.lat, end.lng, 5);
     const distance = startPos.distanceTo(endPos);
-    const midHeight = 5 + distance * 0.6;
+    const midHeight = 5 + distance * 0.7; // Higher arcs
     const midPos = startPos.clone().add(endPos).multiplyScalar(0.5).normalize().multiplyScalar(midHeight);
 
     return new THREE.QuadraticBezierCurve3(startPos, midPos, endPos);
@@ -218,7 +225,7 @@ const Arc = ({ start, end }) => {
           itemSize={3}
         />
       </bufferGeometry>
-      <lineBasicMaterial color="#00ffff" opacity={1} transparent linewidth={3} toneMapped={false} />
+      <lineBasicMaterial color="#ff4081" opacity={0.8} transparent linewidth={2} toneMapped={false} /> {/* Hot Pink */}
     </line>
   );
 };

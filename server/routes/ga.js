@@ -53,7 +53,9 @@ router.get('/dashboard-data', async (req, res) => {
             endLng: TURKEY_LNG,
             activeUsers: item.activeUsers,
             city: item.city,
-            country: item.country
+            country: item.country,
+            page: item.page,
+            label: `${item.city} \n ${item.page}` // Multi-line label: City + Page
           });
         }
       }
@@ -71,7 +73,7 @@ router.get('/dashboard-data', async (req, res) => {
       }
     };
 
-    setCache(CACHE_KEY, responseData, 300); // 5 min cache
+    setCache(CACHE_KEY, responseData, 10); // 10s cache for live feel
     res.json(responseData);
 
   } catch (error) {

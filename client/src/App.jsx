@@ -51,7 +51,18 @@ function App() {
   return (
     <div className="fixed inset-0 w-full h-full bg-[#020202] text-white overflow-hidden font-sans selection:bg-cyan-500/30 selection:text-cyan-100">
 
-      {/* 1. Full Screen Globe Background */}
+      {/* 1. Project Header */}
+      <div className="absolute top-8 left-8 z-50">
+        <h1 className="text-4xl font-bold tracking-tighter font-display text-white drop-shadow-lg">
+          GLOBE<span className="text-cyan-400">ANALYTICS</span>
+        </h1>
+        <div className="flex items-center gap-2 mt-1">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <span className="text-xs text-cyan-400/80 font-mono tracking-widest">LIVE MONITORING</span>
+        </div>
+      </div>
+
+      {/* 2. Full Screen Globe Background */}
       <div className="absolute inset-0 z-0 w-full h-full">
         <Canvas
           className="w-full h-full block"
@@ -66,7 +77,7 @@ function App() {
 
           <Stars radius={100} depth={50} count={7000} factor={4} saturation={0} fade speed={1} />
 
-          <group position={[6, 0, 0]}>
+          <group position={[3, 0, 0]}> {/* Shifted to x=3 (Leftwards from 6) */}
             <ParticleGlobe routes={data?.routes} />
           </group>
 
@@ -77,21 +88,18 @@ function App() {
             maxDistance={50}
             autoRotate
             autoRotateSpeed={0.5}
-            target={[6, 0, 0]}
+            target={[3, 0, 0]}
           />
         </Canvas>
       </div>
 
-      {/* 2. Floating Sidebar Overlay */}
-      <div className="absolute top-0 left-0 h-full w-[400px] z-10 p-6 pointer-events-none">
-        {/* Pointer events auto re-enabled on the sidebar content itself */}
-        <div className="h-full w-full pointer-events-auto">
-          <DashboardSidebar
-            stats={data?.stats}
-            countries={data?.countries}
-            pages={data?.pages}
-          />
-        </div>
+      {/* 3. Floating Sidebar Overlay (Stats) */}
+      <div className="absolute top-24 left-8 h-[calc(100vh-8rem)] w-[380px] z-50">
+        <DashboardSidebar
+          stats={data?.stats}
+          countries={data?.countries}
+          pages={data?.pages}
+        />
       </div>
 
       {/* Error Toast */}

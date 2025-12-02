@@ -1,12 +1,12 @@
 import express from 'express';
-import { fetchActiveUsers } from '../services/ga4.js';
+import { fetchAnalyticsData } from '../services/ga4.js';
 import { geocodeCity } from '../services/geocode.js';
 import { getCache, setCache } from '../cache.js';
 
 const router = express.Router();
 
-router.get('/visitors', async (req, res) => {
-  const CACHE_KEY = 'visitors_data';
+router.get('/dashboard-data', async (req, res) => {
+  const CACHE_KEY = 'dashboard_data';
 
   // Check cache
   const cachedData = getCache(CACHE_KEY);
@@ -15,37 +15,67 @@ router.get('/visitors', async (req, res) => {
   }
 
   try {
-    // Fetch from GA4
-    const gaData = await fetchActiveUsers();
+    const rawData = await fetchAnalyticsData();
 
-    // Geocode each location
-    // Note: In production, you'd want to cache geocoding results individually to avoid rate limits
-    // or use a batch geocoder. For this demo, we'll do it sequentially or parallel with limit.
-    // Open-Meteo has rate limits, so be careful.
+    // 1. Aggregate Countries
+    const countryMap = {};
+    // 2. Aggregate Pages
+    const pageMap = {};
+    // 3. Prepare Routes (City -> Turkey)
+    const routes = [];
 
-    const processedData = await Promise.all(gaData.map(async (item) => {
-      if (!item.city || item.city === '(not set)') return null;
+    // Turkey Center Coordinates
+    const TURKEY_LAT = 39.9334;
+    const TURKEY_LNG = 32.8597;
 
-      const coords = await geocodeCity(item.city, item.country);
-      if (coords) {
-        return {
-          ...item,
-          lat: coords.lat,
-          lng: coords.lng
-        };
+    // Process Data
+    for (const item of rawData) {
+      // Country Aggregation
+      if (!countryMap[item.country]) {
+        countryMap[item.country] = { name: item.country, activeUsers: 0 };
       }
-      return null;
-    }));
+      countryMap[item.country].activeUsers += item.activeUsers;
 
-    // Filter out nulls
-    const validData = processedData.filter(item => item !== null);
+      // Page Aggregation
+      if (!pageMap[item.page]) {
+        pageMap[item.page] = { path: item.page, views: 0 };
+      }
+      pageMap[item.page].views += item.activeUsers; // Using active users as proxy for "live views"
 
-    // Cache result (5 minutes)
-    setCache(CACHE_KEY, validData, 300);
+      // Route Processing (Geocoding)
+      if (item.city && item.city !== '(not set)') {
+        const coords = await geocodeCity(item.city, item.country);
+        if (coords) {
+          routes.push({
+            startLat: coords.lat,
+            startLng: coords.lng,
+            endLat: TURKEY_LAT,
+            endLng: TURKEY_LNG,
+            activeUsers: item.activeUsers,
+            city: item.city,
+            country: item.country
+          });
+        }
+      }
+    }
 
-    res.json(validData);
+    const responseData = {
+      countries: Object.values(countryMap).sort((a, b) => b.activeUsers - a.activeUsers),
+      pages: Object.values(pageMap).sort((a, b) => b.views - a.views).slice(0, 10),
+      routes: routes,
+      stats: {
+        activeUsers: rawData.reduce((sum, item) => sum + item.activeUsers, 0),
+        uniqueCountries: Object.keys(countryMap).length,
+        uniqueCities: routes.length, // Approx
+        totalPageViews: rawData.reduce((sum, item) => sum + item.screenPageViews, 0)
+      }
+    };
+
+    setCache(CACHE_KEY, responseData, 300); // 5 min cache
+    res.json(responseData);
+
   } catch (error) {
-    console.error('Error in /visitors route:', error);
+    console.error('Error in /dashboard-data:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });

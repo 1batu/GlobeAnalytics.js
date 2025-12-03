@@ -267,3 +267,43 @@ canvas {
   color: #22d3ee;
   font-weight: bold;
 }
+
+/* Hero Counter (Total Active Users) */
+.hero-counter {
+  position: absolute;
+  top: 10px;
+  left: 940px; /* Position next to Traffic Sources (630px + 300px + 10px gap) */
+  z-index: 1000;
+  pointer-events: none; /* Let clicks pass through */
+  background: rgba(
+    10,
+    10,
+    20,
+    0.6
+  ); /* Optional: slight background for readability */
+  padding: 5px 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  display: flex; /* Horizontal layout */
+  align-items: center;
+}
+
+.hero-label {
+  font-size: 11px;
+  color: #aaa;
+  letter-spacing: 1px;
+  margin-bottom: 0; /* Remove bottom margin */
+  margin-right: 15px; /* Add right spacing */
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.hero-number {
+  font-size: 32px;
+  font-weight: 300;
+  color: #fff;
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(34, 211, 238, 0.5);
+  font-family: "Courier New", Courier, monospace; /* Digital look */
+}

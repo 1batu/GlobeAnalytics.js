@@ -182,6 +182,16 @@ async function fetchAndProcessData() {
       }
     }
 
+    // 7. Update Total Active Users Counter (Hero Number)
+    if (dashboardData.stats && dashboardData.stats.activeUsers !== undefined) {
+      const counterElement = document.getElementById('total-active-users');
+      if (counterElement) {
+        // Simple animation: Count up if difference is large, or just set text
+        // For now, direct update is cleaner for frequent polling
+        counterElement.textContent = dashboardData.stats.activeUsers;
+      }
+    }
+
     return true;
   } catch(error) {
     console.log('Error loading dashboard data:', error);

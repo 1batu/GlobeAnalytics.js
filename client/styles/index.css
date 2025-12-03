@@ -77,7 +77,7 @@ canvas {
 
 .panel-header h3 {
   margin: 0;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -113,7 +113,7 @@ canvas {
   justify-content: space-between;
   padding: 8px 15px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 13px;
+  font-size: 11px;
 }
 
 #active-pages-list li:last-child {
@@ -184,7 +184,7 @@ canvas {
   justify-content: space-between;
   padding: 8px 15px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 13px;
+  font-size: 11px;
 }
 
 #top-cities-list li:last-child {

@@ -57,9 +57,11 @@ async function fetchAndProcessData() {
         'Bulgaristan': 'Bulgaria',
 
         // English Variations
-        'United States of America': 'United States',
         'USA': 'United States',
-        'The Netherlands': 'Netherlands'
+        'The Netherlands': 'Netherlands',
+        'Güney Afrika': 'South Africa',
+        'İsviçre': 'Switzerland',
+        'Avusturya': 'Austria'
       };
       return map[name] || name;
     };

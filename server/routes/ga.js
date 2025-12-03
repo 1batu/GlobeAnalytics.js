@@ -6,7 +6,7 @@ import { getCache, setCache } from '../cache.js';
 const router = express.Router();
 
 router.get('/dashboard-data', async (req, res) => {
-  const CACHE_KEY = 'dashboard_data';
+  const CACHE_KEY = 'dashboard_data_v3';
 
   // Check cache
   const cachedData = getCache(CACHE_KEY);
@@ -23,7 +23,9 @@ router.get('/dashboard-data', async (req, res) => {
     const pageMap = {};
     // 3. Aggregate Cities
     const cityMap = {};
-    // 4. Prepare Routes (City -> Turkey)
+    // 4. Aggregate Devices
+    const deviceMap = {};
+    // 5. Prepare Routes (City -> Turkey)
     const routes = [];
 
     // Turkey Center Coordinates
@@ -52,6 +54,13 @@ router.get('/dashboard-data', async (req, res) => {
       }
       pageMap[item.page].views += item.activeUsers; // Using active users as proxy for "live views"
 
+      // Device Aggregation
+      const device = item.device || 'desktop'; // Default to desktop if missing
+      if (!deviceMap[device]) {
+        deviceMap[device] = { name: device, activeUsers: 0 };
+      }
+      deviceMap[device].activeUsers += item.activeUsers;
+
       // Route Processing (Geocoding)
       if (item.city && item.city !== '(not set)') {
         const coords = await geocodeCity(item.city, item.country);
@@ -75,6 +84,7 @@ router.get('/dashboard-data', async (req, res) => {
       countries: Object.values(countryMap).sort((a, b) => b.activeUsers - a.activeUsers),
       cities: Object.values(cityMap).sort((a, b) => b.activeUsers - a.activeUsers).slice(0, 10),
       pages: Object.values(pageMap).sort((a, b) => b.views - a.views).slice(0, 10),
+      sources: Object.values(deviceMap).sort((a, b) => b.activeUsers - a.activeUsers).slice(0, 10),
       routes: routes,
       stats: {
         activeUsers: rawData.reduce((sum, item) => sum + item.activeUsers, 0),

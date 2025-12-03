@@ -61,7 +61,13 @@ async function fetchAndProcessData() {
         'The Netherlands': 'Netherlands',
         'Güney Afrika': 'South Africa',
         'İsviçre': 'Switzerland',
-        'Avusturya': 'Austria'
+        'Avusturya': 'Austria',
+        'Macaristan': 'Hungary',
+        'Kıbrıs': 'Cyprus',
+        'Irak': 'Iraq',
+        'Özbekistan': 'Uzbekistan',
+        'Nijerya': 'Nigeria',
+        'Endonezya': 'Indonesia'
       };
       return map[name] || name;
     };
@@ -158,6 +164,24 @@ async function fetchAndProcessData() {
       }
     }
 
+    // 6. Update Traffic Sources Panel
+    console.log('Traffic Sources Data:', dashboardData.sources);
+    if (dashboardData.sources) {
+      const listElement = document.getElementById('traffic-sources-list');
+      console.log('Traffic Sources List Element:', listElement);
+      if (listElement) {
+        listElement.innerHTML = ''; // Clear existing list
+        dashboardData.sources.forEach(source => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <span class="source-name">${source.name}</span>
+            <span class="source-users">${source.activeUsers}</span>
+          `;
+          listElement.appendChild(li);
+        });
+      }
+    }
+
     return true;
   } catch(error) {
     console.log('Error loading dashboard data:', error);
@@ -195,6 +219,21 @@ document.addEventListener('DOMContentLoaded', () => {
         citiesToggleBtn.textContent = 'Open List';
       } else {
         citiesToggleBtn.textContent = 'Close List';
+      }
+    });
+  }
+
+  // Traffic Sources Panel
+  const sourcesPanel = document.querySelector('.traffic-sources-panel');
+  const sourcesToggleBtn = document.getElementById('toggle-sources-btn');
+
+  if (sourcesPanel && sourcesToggleBtn) {
+    sourcesToggleBtn.addEventListener('click', () => {
+      sourcesPanel.classList.toggle('closed');
+      if (sourcesPanel.classList.contains('closed')) {
+        sourcesToggleBtn.textContent = 'Open List';
+      } else {
+        sourcesToggleBtn.textContent = 'Close List';
       }
     });
   }

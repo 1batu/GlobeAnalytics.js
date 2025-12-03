@@ -6,7 +6,8 @@ import { getCache, setCache } from '../cache.js';
 const router = express.Router();
 
 router.get('/dashboard-data', async (req, res) => {
-  const CACHE_KEY = 'dashboard_data_v3';
+  // Dynamic Cache Key (Unique per request to avoid caching issues)
+  const CACHE_KEY = `dashboard_data_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
   // Check cache
   const cachedData = getCache(CACHE_KEY);
@@ -34,6 +35,9 @@ router.get('/dashboard-data', async (req, res) => {
 
     // Process Data
     for (const item of rawData) {
+      // Skip invalid country data
+      if (!item.country || item.country === '(not set)') continue;
+
       // Country Aggregation
       if (!countryMap[item.country]) {
         countryMap[item.country] = { name: item.country, activeUsers: 0 };

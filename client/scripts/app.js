@@ -68,8 +68,21 @@ class App {
   }
 
   addControlGui = callback => {
-    var gui = new dat.GUI();
+    var gui = new dat.GUI({ closed: true });
     callback(gui);
+
+    // Custom logic to handle Open/Close text
+    const closeButton = gui.domElement.querySelector('.close-button');
+    if (closeButton) {
+      closeButton.textContent = 'Open Controls';
+      closeButton.addEventListener('click', () => {
+        if (gui.closed) {
+          closeButton.textContent = 'Open Controls';
+        } else {
+          closeButton.textContent = 'Close Controls';
+        }
+      });
+    }
   }
 
   handleResize = () => {

@@ -25,8 +25,8 @@ app.use(express.json());
 
 app.use("/api", gaRoutes);
 
-// Serve Static Frontend (Threejs-globe-master)
-const clientPath = path.join(__dirname, '../Threejs-globe-master');
+// Serve Static Frontend (client)
+const clientPath = path.join(__dirname, '../client');
 app.use(express.static(clientPath));
 
 app.get("/", (req, res) => {

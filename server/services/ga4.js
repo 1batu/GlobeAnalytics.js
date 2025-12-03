@@ -11,9 +11,50 @@ const analyticsDataClient = new BetaAnalyticsDataClient();
 const PROPERTY_ID = process.env.GA4_PROPERTY_ID;
 
 export const fetchAnalyticsData = async () => {
+  // MOCK DATA MODE (If no credentials)
   if (!process.env.GA4_PROPERTY_ID) {
-    console.error('GA4_PROPERTY_ID is missing in .env');
-    return [];
+    console.log('GA4_PROPERTY_ID missing. Serving Mock Data.');
+
+    const mockCountries = [
+      { country: 'United States', city: 'New York', page: '/home', weight: 0.3 },
+      { country: 'United States', city: 'San Francisco', page: '/dashboard', weight: 0.2 },
+      { country: 'Germany', city: 'Berlin', page: '/pricing', weight: 0.15 },
+      { country: 'United Kingdom', city: 'London', page: '/blog', weight: 0.15 },
+      { country: 'Japan', city: 'Tokyo', page: '/home', weight: 0.1 },
+      { country: 'Brazil', city: 'Sao Paulo', page: '/features', weight: 0.05 },
+      { country: 'India', city: 'Mumbai', page: '/docs', weight: 0.05 },
+    ];
+
+    const data = [];
+    // Generate 20-30 random active sessions
+    const sessionCount = Math.floor(Math.random() * 10) + 20;
+
+    for (let i = 0; i < sessionCount; i++) {
+      const rand = Math.random();
+      let cumulativeWeight = 0;
+      let selected = mockCountries[0];
+
+      for (const item of mockCountries) {
+        cumulativeWeight += item.weight;
+        if (rand < cumulativeWeight) {
+          selected = item;
+          break;
+        }
+      }
+
+      // Add some randomness to active users per session
+      const activeUsers = Math.floor(Math.random() * 50) + 10;
+
+      data.push({
+        country: selected.country,
+        city: selected.city,
+        page: selected.page,
+        activeUsers: activeUsers,
+        screenPageViews: activeUsers * (Math.floor(Math.random() * 3) + 1)
+      });
+    }
+
+    return data;
   }
 
   try {
@@ -22,9 +63,6 @@ export const fetchAnalyticsData = async () => {
       dimensions: [
         { name: 'country' },
         { name: 'city' },
-        // Note: 'pagePath' might not be available in real-time API for all properties.
-        // Using 'unifiedScreenName' or similar if pagePath fails, but sticking to standard first.
-        // For Realtime API, standard dimensions are limited. Let's try 'unifiedScreenName' as a proxy for page/screen.
         { name: 'unifiedScreenName' }
       ],
       metrics: [

@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+@import url("https://fonts.googleapis.com/css?family=Open+Sans&display=swap");
 
 body,
 html {
-	margin: 0;
-	padding: 0;
-	font-family: 'Open Sans', sans-serif;
+  margin: 0;
+  padding: 0;
+  font-family: "Open Sans", sans-serif;
 }
 
 canvas {
@@ -12,35 +12,123 @@ canvas {
 }
 
 .dg.a {
-	margin-top: 10px;
-	min-width: 300px;
+  margin-top: 10px;
+  min-width: 300px;
 }
 
 .app-wrapper {
-	position: fixed;
-	left: 0;
-	top: 0;
+  position: fixed;
+  left: 0;
+  top: 0;
 }
 
 .markers {
-	position: relative;
-	padding: 0;
-	list-style-type: none;
+  position: relative;
+  padding: 0;
+  list-style-type: none;
 }
 
 .marker {
-	color: white;
-	font-weight: 300;
-	font-size: 14px;
+  color: white;
+  font-weight: 300;
+  font-size: 14px;
 }
 
 .marker:before {
-	content: '';
-	width: 30px;
-	height: 30px;
-	border-radius: 50%;
-	background: white;
-	position: absolute;
-	left: 50%;
-	top: -50%;
+  content: "";
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: white;
+  position: absolute;
+  left: 50%;
+  top: -50%;
+}
+
+/* Active Pages Panel */
+.active-pages-panel {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 300px;
+  background: rgba(10, 10, 20, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-family: "Open Sans", sans-serif;
+  z-index: 1000;
+  transition: height 0.3s ease, padding 0.3s ease;
+  overflow: hidden;
+  max-height: 400px; /* Open state max height */
+}
+
+.active-pages-panel.closed {
+  max-height: 50px; /* Closed state height */
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #22d3ee;
+}
+
+#toggle-pages-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #aaa;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#toggle-pages-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+#active-pages-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+#active-pages-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 13px;
+}
+
+#active-pages-list li:last-child {
+  border-bottom: none;
+}
+
+#active-pages-list li .page-path {
+  color: #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+#active-pages-list li .page-views {
+  color: #22d3ee;
+  font-weight: bold;
 }

@@ -107,6 +107,22 @@ async function fetchAndProcessData() {
     // getCountries converts names to country objects
     data.connections = getCountries(rawConnections, data.countries);
 
+    // 4. Update Active Pages Panel
+    if (dashboardData.pages) {
+      const listElement = document.getElementById('active-pages-list');
+      if (listElement) {
+        listElement.innerHTML = ''; // Clear existing list
+        dashboardData.pages.forEach(page => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <span class="page-path" title="${page.path}">${page.path}</span>
+            <span class="page-views">${page.views}</span>
+          `;
+          listElement.appendChild(li);
+        });
+      }
+    }
+
     return true;
   } catch(error) {
     console.log('Error loading dashboard data:', error);
@@ -115,6 +131,23 @@ async function fetchAndProcessData() {
     return false;
   }
 }
+
+// Initialize Panel Toggle Logic
+document.addEventListener('DOMContentLoaded', () => {
+  const panel = document.querySelector('.active-pages-panel');
+  const toggleBtn = document.getElementById('toggle-pages-btn');
+
+  if (panel && toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      panel.classList.toggle('closed');
+      if (panel.classList.contains('closed')) {
+        toggleBtn.textContent = 'Open List';
+      } else {
+        toggleBtn.textContent = 'Close List';
+      }
+    });
+  }
+});
 
 async function preload() {
   return await fetchAndProcessData();

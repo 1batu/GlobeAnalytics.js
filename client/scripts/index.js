@@ -112,7 +112,10 @@ async function fetchAndProcessData() {
       const listElement = document.getElementById('active-pages-list');
       if (listElement) {
         listElement.innerHTML = ''; // Clear existing list
+
+        let displayedUsers = 0;
         dashboardData.pages.forEach(page => {
+          displayedUsers += page.views;
           const li = document.createElement('li');
           li.innerHTML = `
             <span class="page-path" title="${page.path}">${page.path}</span>
@@ -120,6 +123,20 @@ async function fetchAndProcessData() {
           `;
           listElement.appendChild(li);
         });
+
+        // Add "Other Pages" if there are remaining users
+        if (dashboardData.stats && dashboardData.stats.activeUsers > displayedUsers) {
+          const otherUsers = dashboardData.stats.activeUsers - displayedUsers;
+          if (otherUsers > 0) {
+            const li = document.createElement('li');
+            li.style.borderTop = '1px dashed rgba(255,255,255,0.2)'; // Visual separator
+            li.innerHTML = `
+              <span class="page-path" style="font-style: italic; color: #aaa;">Other Pages</span>
+              <span class="page-views">${otherUsers}</span>
+            `;
+            listElement.appendChild(li);
+          }
+        }
       }
     }
 

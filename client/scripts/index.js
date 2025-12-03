@@ -123,6 +123,22 @@ async function fetchAndProcessData() {
       }
     }
 
+    // 5. Update Top Cities Panel
+    if (dashboardData.cities) {
+      const listElement = document.getElementById('top-cities-list');
+      if (listElement) {
+        listElement.innerHTML = ''; // Clear existing list
+        dashboardData.cities.forEach(city => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <span class="city-name">${city.name}, ${city.country}</span>
+            <span class="city-users">${city.activeUsers}</span>
+          `;
+          listElement.appendChild(li);
+        });
+      }
+    }
+
     return true;
   } catch(error) {
     console.log('Error loading dashboard data:', error);
@@ -134,16 +150,32 @@ async function fetchAndProcessData() {
 
 // Initialize Panel Toggle Logic
 document.addEventListener('DOMContentLoaded', () => {
-  const panel = document.querySelector('.active-pages-panel');
-  const toggleBtn = document.getElementById('toggle-pages-btn');
+  // Active Pages Panel
+  const pagesPanel = document.querySelector('.active-pages-panel');
+  const pagesToggleBtn = document.getElementById('toggle-pages-btn');
 
-  if (panel && toggleBtn) {
-    toggleBtn.addEventListener('click', () => {
-      panel.classList.toggle('closed');
-      if (panel.classList.contains('closed')) {
-        toggleBtn.textContent = 'Open List';
+  if (pagesPanel && pagesToggleBtn) {
+    pagesToggleBtn.addEventListener('click', () => {
+      pagesPanel.classList.toggle('closed');
+      if (pagesPanel.classList.contains('closed')) {
+        pagesToggleBtn.textContent = 'Open List';
       } else {
-        toggleBtn.textContent = 'Close List';
+        pagesToggleBtn.textContent = 'Close List';
+      }
+    });
+  }
+
+  // Top Cities Panel
+  const citiesPanel = document.querySelector('.top-cities-panel');
+  const citiesToggleBtn = document.getElementById('toggle-cities-btn');
+
+  if (citiesPanel && citiesToggleBtn) {
+    citiesToggleBtn.addEventListener('click', () => {
+      citiesPanel.classList.toggle('closed');
+      if (citiesPanel.classList.contains('closed')) {
+        citiesToggleBtn.textContent = 'Open List';
+      } else {
+        citiesToggleBtn.textContent = 'Close List';
       }
     });
   }

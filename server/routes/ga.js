@@ -21,7 +21,9 @@ router.get('/dashboard-data', async (req, res) => {
     const countryMap = {};
     // 2. Aggregate Pages
     const pageMap = {};
-    // 3. Prepare Routes (City -> Turkey)
+    // 3. Aggregate Cities
+    const cityMap = {};
+    // 4. Prepare Routes (City -> Turkey)
     const routes = [];
 
     // Turkey Center Coordinates
@@ -35,6 +37,14 @@ router.get('/dashboard-data', async (req, res) => {
         countryMap[item.country] = { name: item.country, activeUsers: 0 };
       }
       countryMap[item.country].activeUsers += item.activeUsers;
+
+      // City Aggregation
+      if (item.city && item.city !== '(not set)') {
+        if (!cityMap[item.city]) {
+          cityMap[item.city] = { name: item.city, country: item.country, activeUsers: 0 };
+        }
+        cityMap[item.city].activeUsers += item.activeUsers;
+      }
 
       // Page Aggregation
       if (!pageMap[item.page]) {
@@ -63,6 +73,7 @@ router.get('/dashboard-data', async (req, res) => {
 
     const responseData = {
       countries: Object.values(countryMap).sort((a, b) => b.activeUsers - a.activeUsers),
+      cities: Object.values(cityMap).sort((a, b) => b.activeUsers - a.activeUsers).slice(0, 10),
       pages: Object.values(pageMap).sort((a, b) => b.views - a.views).slice(0, 10),
       routes: routes,
       stats: {
